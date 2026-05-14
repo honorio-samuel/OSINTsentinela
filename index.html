@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCT - Cyber-OSINT Module</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <header class="main-header">
+        <h1>SCT // CYBER-OSINT MODULE</h1>
+        <div class="system-status">SISTEMA ATIVO - AGUARDANDO PARÂMETROS</div>
+    </header>
+
+    <main class="dashboard-grid">
+        
+        <section class="tool-card" id="infra-tool">
+            <canvas id="canvas-infra" class="matrix-canvas"></canvas>
+            <h2 class="tool-title">01. INFRASTRUCTURE SCANNER</h2>
+            <div class="tool-controls">
+                <input type="text" id="input-infra" placeholder="Insira o Domínio alvo...">
+                <button onclick="startInfraScan(this)">EXECUTAR SCAN</button>
+            </div>
+            <progress id="progress-infra" value="0" max="100"></progress>
+            <div class="terminal-box" id="terminal-infra">
+                <p class="line-log">Aguardando comando...</p>
+            </div>
+            <button class="export-btn" onclick="downloadLog('terminal-infra', 'infra_scan')">BAIXAR LOG (.TXT)</button>
+        </section>
+
+        <section class="tool-card" id="identity-tool">
+            <canvas id="canvas-identity" class="matrix-canvas"></canvas>
+            <h2 class="tool-title">02. IDENTITY TRACER</h2>
+            <div class="tool-controls">
+                <input type="text" id="input-identity" placeholder="Insira o Username...">
+                <button onclick="startIdentityTrace(this)">RASTREAR ALVO</button>
+            </div>
+            <progress id="progress-identity" value="0" max="100"></progress>
+            <div class="terminal-box" id="terminal-identity">
+                <p class="line-log">Aguardando comando...</p>
+            </div>
+            <button class="export-btn" onclick="downloadLog('terminal-identity', 'identity_trace')">BAIXAR LOG (.TXT)</button>
+        </section>
+
+        <section class="tool-card" id="device-tool">
+            <canvas id="canvas-device" class="matrix-canvas"></canvas>
+            <h2 class="tool-title">03. DEVICE AUDITOR</h2>
+            <div class="tool-controls">
+                <input type="text" id="input-device" placeholder="Insira IP ou Rede...">
+                <button onclick="startDeviceAudit(this)">AUDITAR DISPOSITIVOS</button>
+            </div>
+            <progress id="progress-device" value="0" max="100"></progress>
+            <div class="terminal-box" id="terminal-device">
+                <p class="line-log">Aguardando comando...</p>
+            </div>
+            <button class="export-btn" onclick="downloadLog('terminal-device', 'device_audit')">BAIXAR LOG (.TXT)</button>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>

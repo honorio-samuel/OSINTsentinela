@@ -1,0 +1,205 @@
+:root {
+    --primary-green: #00ff41;
+    --dark-bg: #0d0d0d;
+    --card-bg: #1a1a1a;
+    --text-gray: #a0a0a0;
+    --error-red: #ff3e3e;
+}
+
+body {
+    background-color: var(--dark-bg);
+    color: var(--primary-green);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    /* Permite scroll na página inteira apenas se os cards empilharem */
+    overflow-x: hidden;
+    overflow-y: auto;
+    min-height: 100vh;
+}
+
+.main-header {
+    border-bottom: 2px solid var(--primary-green);
+    padding: 1rem;
+    text-align: center;
+    background: #000;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.system-status {
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+}
+
+/* GRID RESPONSIVO: 
+   auto-fit + minmax garante que os cards tenham no mínimo 350px 
+   antes de quebrarem para a linha de baixo. */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+    /* No desktop, tenta manter os cards na altura da tela */
+    min-height: calc(100vh - 100px); 
+}
+
+.tool-card {
+    background: var(--card-bg);
+    border: 1px solid #333;
+    padding: 15px;
+    display: flex;
+    flex-direction: column; /* Essencial para o scroll interno do terminal */
+    border-radius: 5px;
+    position: relative;
+    overflow: hidden;
+    height: 600px; /* Altura fixa para permitir que o terminal interno role */
+    transition: transform 0.3s ease;
+}
+
+.tool-title {
+    font-size: 1.1rem;
+    border-left: 4px solid var(--primary-green);
+    padding-left: 10px;
+    margin-bottom: 20px;
+}
+
+.tool-controls input {
+    width: 100%;
+    background: #000;
+    border: 1px solid #444;
+    color: var(--primary-green);
+    padding: 10px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+.tool-controls button {
+    background: var(--primary-green);
+    color: #000;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: bold;
+    width: 100%;
+}
+
+.tool-controls button:hover {
+    filter: brightness(0.8);
+}
+
+/* TERMINAL COM SCROLL INDEPENDENTE */
+.terminal-box {
+    background: rgba(5, 5, 5, 0.9);
+    flex-grow: 1; /* Faz o terminal ocupar todo o espaço restante do card */
+    margin-top: 15px;
+    padding: 10px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.85rem;
+    overflow-y: auto; /* Scroll vertical ativado */
+    border: 1px inset #222;
+    z-index: 2;
+}
+
+.line-log {
+    margin: 5px 0;
+    border-bottom: 1px solid #111;
+    word-break: break-all;
+}
+
+/* EFEITO MATRIX */
+.matrix-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.7;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.tool-card > *:not(.matrix-canvas) {
+    position: relative;
+    z-index: 1;
+}
+
+/* ESTILIZAÇÃO DO SCROLLBAR (CHROME/EDGE/SAFARI) */
+.terminal-box::-webkit-scrollbar {
+    width: 6px;
+}
+.terminal-box::-webkit-scrollbar-thumb {
+    background: var(--primary-green);
+    border-radius: 10px;
+}
+.terminal-box::-webkit-scrollbar-track {
+    background: #000;
+}
+
+/* MELHORIA NOS INPUTS */
+.tool-controls input:focus {
+    outline: none;
+    border-color: var(--primary-green);
+    box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+}
+
+/* AJUSTE PARA TELAS PEQUENAS */
+@media (max-width: 480px) {
+    .dashboard-grid {
+        padding: 10px;
+    }
+    .tool-card {
+        height: 500px; /* Reduz um pouco a altura em celulares */
+    }
+}
+
+progress {
+    width: 100%;
+    height: 4px;
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    background: #000;
+    margin-top: 10px;
+}
+
+progress::-webkit-progress-bar {
+    background: #000;
+}
+
+progress::-webkit-progress-value {
+    background: var(--primary-green);
+    box-shadow: 0 0 10px var(--primary-green);
+}
+
+progress::-moz-progress-bar {
+    background: var(--primary-green);
+}
+
+/* Botão de Exportação Sutil */
+.export-btn {
+    background: transparent;
+    color: var(--text-gray);
+    border: 1px solid #333;
+    font-size: 0.7rem;
+    padding: 5px;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.export-btn:hover {
+    color: var(--primary-green);
+    border-color: var(--primary-green);
+    background: rgba(0, 255, 65, 0.05);
+}
+
+/* Efeito de carregamento no botão principal */
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
