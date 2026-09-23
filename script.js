@@ -34,25 +34,52 @@ function downloadLog(terminalId, filename) {
 }
 
 // --- FUNÇÕES DE SCAN ---
+async function startInfraScan(btn) {
+    const rawTarget = document.getElementById('input-infra').value.trim();
+    if (!rawTarget) return alert("Insira um domínio!");
 
-function startInfraScan(btn) {
-    const target = document.getElementById('input-infra').value;
-    if (!target) return alert("Alvo vazio!");
+    // Sanitiza a entrada: remove protocolo (http/https), portas e caminhos/barras
+    const target = rawTarget
+        .replace(/^(?:https?:\/\/)?/i, '') // Remove http:// ou https://
+        .split('/')[0]                       // Remove caminhos (ex: /noticias)
+        .split(':')[0];                      // Remove portas (ex: :8080)
 
-    btn.disabled = true; // Desabilita para evitar cliques múltiplos
+    btn.disabled = true;
     const term = 'terminal-infra';
     const prog = 'progress-infra';
 
-    updateProgress(prog, 0);
-    writeToTerminal(term, `INICIANDO VARREDURA: ${target}`);
+    updateProgress(prog, 10);
+    writeToTerminal(term, `INICIANDO CONSULTA DE INFRAESTRUTURA: ${target}`);
 
-    setTimeout(() => { writeToTerminal(term, "Resolvendo DNS..."); updateProgress(prog, 30); }, 1000);
-    setTimeout(() => { writeToTerminal(term, "Analisando Headers HTTP..."); updateProgress(prog, 60); }, 2500);
-    setTimeout(() => { 
-        writeToTerminal(term, "SCAN COMPLETO: Nenhuma vulnerabilidade crítica exposta."); 
+    try {
+        writeToTerminal(term, "Consultando registros DNS via API Google DoH...");
+        updateProgress(prog, 40);
+
+        // Chamada usando o domínio limpo
+        const response = await fetch(`https://dns.google/resolve?name=${encodeURIComponent(target)}&type=A`);
+        const data = await response.json();
+
+        updateProgress(prog, 80);
+
+        if (data.Status === 0 && data.Answer) {
+            writeToTerminal(term, `[DNS RESOLVIDO] Endereços IP encontrados:`);
+            data.Answer.forEach(record => {
+                if (record.type === 1) { // Tipo 1 = Registro A (IPv4)
+                    writeToTerminal(term, ` -> IP IPv4: ${record.data} (TTL: ${record.TTL}s)`);
+                } else {
+                    writeToTerminal(term, ` -> Registro Tipo ${record.type}: ${record.data}`);
+                }
+            });
+        } else {
+            writeToTerminal(term, `[AVISO] Nenhum registro A encontrado para o domínio informado (Status DNS: ${data.Status})`);
+        }
+
         updateProgress(prog, 100);
+    } catch (error) {
+        writeToTerminal(term, `[ERRO] Falha na requisição: ${error.message}`);
+    } finally {
         btn.disabled = false;
-    }, 4500);
+    }
 }
 
 function startIdentityTrace(btn) {
@@ -76,23 +103,45 @@ function startIdentityTrace(btn) {
     });
 }
 
-function startDeviceAudit(btn) {
-    const target = document.getElementById('input-device').value;
-    if (!target) return alert("IP vazio!");
+async function startDeviceAudit(btn) {
+    const ip = document.getElementById('input-device').value.trim();
+    if (!ip) return alert("Insira um endereço IP válido!");
 
     btn.disabled = true;
     const term = 'terminal-device';
     const prog = 'progress-device';
-    updateProgress(prog, 10);
 
-    writeToTerminal(term, `AUDITANDO DISPOSITIVO: ${target}`);
-    
-    setTimeout(() => { writeToTerminal(term, "Porta 443 (SSL) detectada."); updateProgress(prog, 50); }, 1500);
-    setTimeout(() => { 
-        writeToTerminal(term, "ALERTA: Certificado auto-assinado detectado."); 
+    updateProgress(prog, 10);
+    writeToTerminal(term, `AUDITANDO IP VIA SHODAN INTERNETDB: ${ip}`);
+
+    try {
+        updateProgress(prog, 40);
+        
+        // Consulta gratuita ao Shodan InternetDB
+        const response = await fetch(`https://internetdb.shodan.io/${ip}`);
+        
+        if (!response.ok) {
+            throw new Error("IP não encontrado ou sem registros na base pública do Shodan.");
+        }
+
+        const data = await response.json();
+        updateProgress(prog, 80);
+
+        writeToTerminal(term, `[HOSTNAMES] ${data.hostnames.join(', ') || 'Nenhum associado'}`);
+        writeToTerminal(term, `[PORTAS ABERTAS] ${data.ports.length ? data.ports.join(', ') : 'Nenhuma porta padrão detectada'}`);
+        
+        if (data.vulns && data.vulns.length > 0) {
+            writeToTerminal(term, `[ALERTA DE SEGURANÇA] CVEs encontradas: ${data.vulns.slice(0, 4).join(', ')}`);
+        } else {
+            writeToTerminal(term, `[INFO] Nenhuma vulnerabilidade (CVE) cadastrada para este IP.`);
+        }
+
         updateProgress(prog, 100);
+    } catch (error) {
+        writeToTerminal(term, `[ERRO] Falha na auditoria: ${error.message}`);
+    } finally {
         btn.disabled = false;
-    }, 3500);
+    }
 }
 
 // --- EFEITO VISUAL MATRIX ---
