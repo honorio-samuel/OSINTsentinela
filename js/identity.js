@@ -40,22 +40,19 @@
             }
         },
         {
-            name: 'Duolingo',
-            valid: /^[a-z0-9_.-]{1,30}$/i,
-            profile: u => `https://www.duolingo.com/profile/${u}`,
-            api: u => `https://www.duolingo.com/2017-06-30/users?username=${encodeURIComponent(u)}&fields=users%7Busername,name,streak,creationDate,totalXp%7D`,
+            /* A API oficial da Mojang não libera CORS; o PlayerDB é um espelho público dela */
+            name: 'Minecraft',
+            valid: /^[a-z0-9_]{2,16}$/i,
+            profile: u => `https://namemc.com/profile/${u}`,
+            api: u => `https://playerdb.co/api/player/minecraft/${u}`,
             parse(r) {
-                if (!r.ok) return null;
-                const user = r.data && r.data.users && r.data.users[0];
-                if (!user) return { status: NOT_FOUND };
-                return {
-                    status: FOUND,
-                    details: compact([
-                        user.name && `nome: ${user.name}`,
-                        `ofensiva: ${SCT.fmtNum(user.streak || 0)} dia(s) · ${SCT.fmtNum(user.totalXp || 0)} XP`,
-                        user.creationDate && since(user.creationDate * 1000)
-                    ])
-                };
+                const code = (r.data && r.data.code) || '';
+                if (code === 'player.found') {
+                    const player = r.data.data.player;
+                    return { status: FOUND, details: [`nome no jogo: ${player.username} · skin e histórico de nomes públicos`] };
+                }
+                if (r.status === 400 || r.status === 404 || /invalid_username|not_found/.test(code)) return { status: NOT_FOUND };
+                return null;
             }
         },
         {
@@ -287,6 +284,7 @@
         ['Steam', u => `https://steamcommunity.com/id/${u}`],
         ['Pinterest', u => `https://www.pinterest.com/${u}/`],
         ['Scratch', u => `https://scratch.mit.edu/users/${u}/`],
+        ['Duolingo', u => `https://www.duolingo.com/profile/${u}`],
         ['Telegram', u => `https://t.me/${u}`]
     ];
 

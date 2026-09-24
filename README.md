@@ -11,7 +11,7 @@ Plataforma educacional de **OSINT** (*Open Source Intelligence* — Inteligênci
 | # | Módulo | Pergunta | O que faz | Fontes públicas |
 |---|--------|----------|-----------|-----------------|
 | 01 | **Infrastructure Scanner** | O que um site revela? | DNS completo (A, AAAA, MX, NS, TXT), provedor de e-mail, SPF/DMARC, WHOIS (idade e titular do domínio) e subdomínios encontrados em certificados HTTPS | Google DNS-over-HTTPS, RDAP (rdap.org / Registro.br), Cert Spotter (Certificate Transparency) |
-| 02 | **Identity Tracer** | Qual a pegada digital de um @? | Procura o mesmo nome de usuário em 14 plataformas com API pública e gera links de verificação manual para outras 12 redes | APIs públicas de GitHub, Duolingo, Chess.com, Lichess, Twitch, Bluesky, Mastodon, Wikipédia, Gravatar, Keybase, Dev.to, Codeberg, Hacker News e npm |
+| 02 | **Identity Tracer** | Qual a pegada digital de um @? | Procura o mesmo nome de usuário em 14 plataformas com API pública e gera links de verificação manual para outras 13 redes (Instagram, TikTok, Duolingo…) | APIs públicas de GitHub, Minecraft (via PlayerDB), Chess.com, Lichess, Twitch, Bluesky, Mastodon, Wikipédia, Gravatar, Keybase, Dev.to, Codeberg, Hacker News e npm |
 | 03 | **Device Auditor** | O que um IP revela? | Aceita IP ou domínio (ou "usar meu IP"): localização aproximada, provedor, portas abertas, softwares e CVEs já catalogados | ipwho.is / ipinfo.io, Shodan InternetDB |
 | 04 | **Leak Checker** | Sua senha já vazou? | Verifica se uma senha aparece em vazamentos usando **k-anonimato** (só 5 caracteres do hash SHA-1 saem do navegador) e estima a força | Have I Been Pwned — Pwned Passwords |
 
