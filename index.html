@@ -3,62 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SCT - Cyber-OSINT Module</title>
+    <meta name="description" content="Plataforma educacional de OSINT (Inteligência de Fontes Abertas): descubra o que sites, IPs, nomes de usuário e senhas revelam na internet — sem invadir nada.">
+    <meta name="theme-color" content="#0d0d0d">
+    <title>SCT // Cyber-OSINT Module</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230d0d0d'/%3E%3Cpath d='M18 46 30 18M34 46 46 18' stroke='%2300ff41' stroke-width='7' stroke-linecap='round'/%3E%3C/svg%3E">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <canvas id="matrix-bg" aria-hidden="true"></canvas>
 
     <header class="main-header">
-        <h1>SCT // CYBER-OSINT MODULE</h1>
-        <div class="system-status">SISTEMA ATIVO - AGUARDANDO PARÂMETROS</div>
+        <div class="brand">
+            <h1>SCT <span class="slash">//</span> CYBER-OSINT MODULE</h1>
+            <p class="system-status"><span class="pulse" aria-hidden="true"></span><span id="system-status-text">SISTEMA ATIVO</span></p>
+        </div>
+        <div class="header-actions">
+            <button type="button" id="btn-about" class="ghost-btn">O QUE É OSINT?</button>
+            <label class="switch"><input type="checkbox" id="toggle-explain" checked> <span>💡 Explicações</span></label>
+            <label class="switch"><input type="checkbox" id="toggle-matrix" checked> <span>Efeito Matrix</span></label>
+        </div>
     </header>
 
+    <section class="intro" aria-label="Como usar">
+        <ol class="steps">
+            <li><strong>1.</strong> Escolha um módulo</li>
+            <li><strong>2.</strong> Digite um alvo ou clique em um exemplo</li>
+            <li><strong>3.</strong> Veja o que a internet já sabe — com explicações 💡</li>
+        </ol>
+        <p class="ethics">🛡 Reconhecimento <strong>100% passivo</strong>: nenhum módulo invade, ataca ou faz login em sistemas. Tudo vem de bases públicas. Uso educacional.</p>
+    </section>
+
     <main class="dashboard-grid">
-        
-        <section class="tool-card" id="infra-tool">
-            <canvas id="canvas-infra" class="matrix-canvas"></canvas>
-            <h2 class="tool-title">01. INFRASTRUCTURE SCANNER</h2>
-            <div class="tool-controls">
-                <input type="text" id="input-infra" placeholder="Insira o Domínio alvo...">
-                <button onclick="startInfraScan(this)">EXECUTAR SCAN</button>
+
+        <!-- 01 ------------------------------------------------------------ -->
+        <section class="tool-card" id="infra-tool" data-module="infra" aria-labelledby="title-infra">
+            <header class="tool-head">
+                <span class="tool-num">01</span>
+                <div>
+                    <h2 class="tool-title" id="title-infra">INFRASTRUCTURE SCANNER</h2>
+                    <p class="tool-question">O que um site revela?</p>
+                </div>
+                <button type="button" class="expand-btn" data-expand>⛶ AMPLIAR</button>
+            </header>
+            <p class="tool-desc">DNS completo, quem cuida dos e-mails, idade e dono do domínio (WHOIS) e subdomínios encontrados em certificados HTTPS.</p>
+            <form class="tool-controls" novalidate>
+                <label for="input-infra" class="sr-only">Domínio alvo</label>
+                <input type="text" id="input-infra" placeholder="Domínio ou endereço (ex: ifsudestemg.edu.br)" autocomplete="off" autocapitalize="off" spellcheck="false" inputmode="url">
+                <button type="submit">EXECUTAR SCAN</button>
+            </form>
+            <div class="examples"><span>Experimente:</span>
+                <button type="button" class="chip" data-value="ifsudestemg.edu.br">ifsudestemg.edu.br</button>
+                <button type="button" class="chip" data-value="github.com">github.com</button>
+                <button type="button" class="chip" data-value="https://www.gov.br/pt-br">gov.br</button>
             </div>
-            <progress id="progress-infra" value="0" max="100"></progress>
-            <div class="terminal-box" id="terminal-infra">
-                <p class="line-log">Aguardando comando...</p>
+            <progress value="0" max="100" aria-label="Progresso do scan"></progress>
+            <div class="terminal-box" role="log" aria-live="polite" tabindex="0"></div>
+            <div class="tool-footer">
+                <button type="button" class="export-btn" data-export>BAIXAR RELATÓRIO (.TXT)</button>
+                <button type="button" class="export-btn" data-copy>COPIAR</button>
+                <button type="button" class="export-btn" data-clear>LIMPAR</button>
             </div>
-            <button class="export-btn" onclick="downloadLog('terminal-infra', 'infra_scan')">BAIXAR LOG (.TXT)</button>
         </section>
 
-        <section class="tool-card" id="identity-tool">
-            <canvas id="canvas-identity" class="matrix-canvas"></canvas>
-            <h2 class="tool-title">02. IDENTITY TRACER</h2>
-            <div class="tool-controls">
-                <input type="text" id="input-identity" placeholder="Insira o Username...">
-                <button onclick="startIdentityTrace(this)">RASTREAR ALVO</button>
+        <!-- 02 ------------------------------------------------------------ -->
+        <section class="tool-card" id="identity-tool" data-module="identity" aria-labelledby="title-identity">
+            <header class="tool-head">
+                <span class="tool-num">02</span>
+                <div>
+                    <h2 class="tool-title" id="title-identity">IDENTITY TRACER</h2>
+                    <p class="tool-question">Qual a pegada digital de um @?</p>
+                </div>
+                <button type="button" class="expand-btn" data-expand>⛶ AMPLIAR</button>
+            </header>
+            <p class="tool-desc">Procura o mesmo nome de usuário em 14 plataformas com API pública e gera links para conferir outras 12 redes sociais.</p>
+            <form class="tool-controls" novalidate>
+                <label for="input-identity" class="sr-only">Nome de usuário</label>
+                <input type="text" id="input-identity" placeholder="Nome de usuário (ex: torvalds)" autocomplete="off" autocapitalize="off" spellcheck="false">
+                <button type="submit">RASTREAR ALVO</button>
+            </form>
+            <div class="examples"><span>Experimente:</span>
+                <button type="button" class="chip" data-value="torvalds">torvalds</button>
+                <button type="button" class="chip" data-value="hikaru">hikaru</button>
+                <button type="button" class="chip" data-value="luis">luis</button>
             </div>
-            <progress id="progress-identity" value="0" max="100"></progress>
-            <div class="terminal-box" id="terminal-identity">
-                <p class="line-log">Aguardando comando...</p>
+            <progress value="0" max="100" aria-label="Progresso do rastreamento"></progress>
+            <div class="terminal-box" role="log" aria-live="polite" tabindex="0"></div>
+            <div class="tool-footer">
+                <button type="button" class="export-btn" data-export>BAIXAR RELATÓRIO (.TXT)</button>
+                <button type="button" class="export-btn" data-copy>COPIAR</button>
+                <button type="button" class="export-btn" data-clear>LIMPAR</button>
             </div>
-            <button class="export-btn" onclick="downloadLog('terminal-identity', 'identity_trace')">BAIXAR LOG (.TXT)</button>
         </section>
 
-        <section class="tool-card" id="device-tool">
-            <canvas id="canvas-device" class="matrix-canvas"></canvas>
-            <h2 class="tool-title">03. DEVICE AUDITOR</h2>
-            <div class="tool-controls">
-                <input type="text" id="input-device" placeholder="Insira IP ou Rede...">
-                <button onclick="startDeviceAudit(this)">AUDITAR DISPOSITIVOS</button>
+        <!-- 03 ------------------------------------------------------------ -->
+        <section class="tool-card" id="device-tool" data-module="device" aria-labelledby="title-device">
+            <header class="tool-head">
+                <span class="tool-num">03</span>
+                <div>
+                    <h2 class="tool-title" id="title-device">DEVICE AUDITOR</h2>
+                    <p class="tool-question">O que um IP revela?</p>
+                </div>
+                <button type="button" class="expand-btn" data-expand>⛶ AMPLIAR</button>
+            </header>
+            <p class="tool-desc">Localização aproximada, provedor, portas abertas e falhas conhecidas (CVEs) — sem fazer varredura no alvo.</p>
+            <form class="tool-controls two-buttons" novalidate>
+                <label for="input-device" class="sr-only">IP ou domínio</label>
+                <input type="text" id="input-device" placeholder="IP ou domínio (ex: 8.8.8.8)" autocomplete="off" autocapitalize="off" spellcheck="false">
+                <button type="submit">AUDITAR DISPOSITIVO</button>
+                <button type="button" id="btn-self-ip" class="secondary">USAR MEU IP</button>
+            </form>
+            <div class="examples"><span>Experimente:</span>
+                <button type="button" class="chip" data-value="8.8.8.8">8.8.8.8</button>
+                <button type="button" class="chip" data-value="1.1.1.1">1.1.1.1</button>
+                <button type="button" class="chip" data-value="192.168.0.1">192.168.0.1</button>
             </div>
-            <progress id="progress-device" value="0" max="100"></progress>
-            <div class="terminal-box" id="terminal-device">
-                <p class="line-log">Aguardando comando...</p>
+            <progress value="0" max="100" aria-label="Progresso da auditoria"></progress>
+            <div class="terminal-box" role="log" aria-live="polite" tabindex="0"></div>
+            <div class="tool-footer">
+                <button type="button" class="export-btn" data-export>BAIXAR RELATÓRIO (.TXT)</button>
+                <button type="button" class="export-btn" data-copy>COPIAR</button>
+                <button type="button" class="export-btn" data-clear>LIMPAR</button>
             </div>
-            <button class="export-btn" onclick="downloadLog('terminal-device', 'device_audit')">BAIXAR LOG (.TXT)</button>
+        </section>
+
+        <!-- 04 ------------------------------------------------------------ -->
+        <section class="tool-card" id="leak-tool" data-module="leak" aria-labelledby="title-leak">
+            <header class="tool-head">
+                <span class="tool-num">04</span>
+                <div>
+                    <h2 class="tool-title" id="title-leak">LEAK CHECKER</h2>
+                    <p class="tool-question">Sua senha já vazou?</p>
+                </div>
+                <button type="button" class="expand-btn" data-expand>⛶ AMPLIAR</button>
+            </header>
+            <p class="tool-desc">Compara com centenas de milhões de senhas vazadas usando k-anonimato: a senha nunca sai deste computador.</p>
+            <form class="tool-controls two-buttons" novalidate>
+                <label for="input-leak" class="sr-only">Senha de exemplo</label>
+                <input type="password" id="input-leak" placeholder="Senha de exemplo (ex: 123456)" autocomplete="off" spellcheck="false">
+                <button type="submit">VERIFICAR SENHA</button>
+                <button type="button" id="btn-reveal" class="secondary" aria-pressed="false">MOSTRAR</button>
+            </form>
+            <div class="examples"><span>Experimente:</span>
+                <button type="button" class="chip" data-value="123456">123456</button>
+                <button type="button" class="chip" data-value="senha123">senha123</button>
+                <button type="button" class="chip" data-value="flamengo">flamengo</button>
+                <button type="button" class="chip" data-value="cavalo-bateria-grampo-correto">cavalo-bateria-grampo-correto</button>
+            </div>
+            <p class="safety-note">⚠ Em computadores públicos, teste apenas senhas de exemplo — nunca a sua senha real.</p>
+            <progress value="0" max="100" aria-label="Progresso da verificação"></progress>
+            <div class="terminal-box" role="log" aria-live="polite" tabindex="0"></div>
+            <div class="tool-footer">
+                <button type="button" class="export-btn" data-export>BAIXAR RELATÓRIO (.TXT)</button>
+                <button type="button" class="export-btn" data-copy>COPIAR</button>
+                <button type="button" class="export-btn" data-clear>LIMPAR</button>
+            </div>
         </section>
 
     </main>
 
-    <script src="script.js"></script>
+    <dialog id="about-dialog" aria-labelledby="about-title">
+        <div class="dialog-body">
+            <button type="button" class="dialog-close" data-close aria-label="Fechar">✕</button>
+            <h2 id="about-title">O que é OSINT?</h2>
+            <p><strong>OSINT</strong> (<em>Open Source Intelligence</em>, ou Inteligência de Fontes Abertas) é investigar usando apenas informações <strong>públicas</strong>: sites, redes sociais, registros de domínio, certificados, mapas, notícias.</p>
+            <p>É usado por <strong>jornalistas</strong> (checagem de fatos), <strong>polícia</strong>, <strong>equipes de segurança</strong> (para saber o que um atacante veria)… e também por <strong>golpistas</strong>. Por isso vale a pena saber o que está exposto sobre você.</p>
+
+            <h3>Como este sistema funciona</h3>
+            <ul>
+                <li>Roda 100% no seu navegador: não há servidor próprio e nada é salvo.</li>
+                <li>Só consulta bases públicas: Google DNS, RDAP/Registro.br, Cert Spotter (certificados), Shodan InternetDB, ipwho.is, APIs públicas de plataformas e Have I Been Pwned.</li>
+                <li>Não faz varredura, não tenta senhas e não acessa nenhuma conta.</li>
+            </ul>
+
+            <h3>Público não é "liberado para tudo"</h3>
+            <p>Usar dados públicos para perseguir, expor ou enganar alguém continua sendo crime, e a <strong>LGPD</strong> protege dados pessoais mesmo quando estão acessíveis. Use o conhecimento para se <strong>proteger</strong>.</p>
+
+            <h3>Como se proteger</h3>
+            <ul>
+                <li>Use frases-senha e uma senha diferente para cada site (um gerenciador de senhas ajuda).</li>
+                <li>Ative a verificação em duas etapas (2FA).</li>
+                <li>Revise o que está público nos seus perfis; evite expor escola, endereço e rotina.</li>
+                <li>Desconfie de sites recém-criados e de links recebidos por mensagem.</li>
+            </ul>
+
+            <p class="credits">Projeto acadêmico inspirado no <a href="https://github.com/RodrigoCGuedes/LUCKyHAT" target="_blank" rel="noopener noreferrer">LUCKyHAT</a>, ferramenta OSINT desenvolvida no IF Sudeste MG — Campus Juiz de Fora.</p>
+        </div>
+    </dialog>
+
+    <footer class="main-footer">
+        <p>Projeto acadêmico de OSINT · Inspirado no <a href="https://github.com/RodrigoCGuedes/LUCKyHAT" target="_blank" rel="noopener noreferrer">LUCKyHAT</a> (IF Sudeste MG — Campus Juiz de Fora) · <a href="https://github.com/honorio-samuel/OSINTsentinela" target="_blank" rel="noopener noreferrer">Código-fonte</a></p>
+        <p class="muted">Uso exclusivamente educacional. Nenhum dado digitado é armazenado.</p>
+    </footer>
+
+    <script src="js/core.js"></script>
+    <script src="js/matrix.js"></script>
+    <script src="js/infra.js"></script>
+    <script src="js/identity.js"></script>
+    <script src="js/device.js"></script>
+    <script src="js/leak.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
